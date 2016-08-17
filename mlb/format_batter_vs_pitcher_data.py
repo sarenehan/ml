@@ -6,7 +6,6 @@ This script generates the matrix used for collaborative filtering
 from database import DBSession
 import numpy as np
 from collections import defaultdict
-import pickle
 
 
 def load_player_ids(player_id_name):
@@ -43,8 +42,7 @@ def save_data(data):
     """
     Pickles the data
     """
-    with open('mlb/reccomendation_system_data.pkl', 'wb') as f:
-        pickle.dump(data, f)
+    np.save('mlb/reccomendation_system_data.pkl', data, allow_pickle=False)
 
 
 def remove_nan_columns(player_array, axis):
