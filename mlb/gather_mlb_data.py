@@ -263,13 +263,13 @@ def create_tables():
     DBSession.query(
         """delete from batting where game_id in
         (select game_id from games where away_team in
-         (select away_team from games group by away_team having count(*) < 10))
+         (select away_team from games group by away_team having count(*) < 10)
         )
         """)
     DBSession.query(
         """delete from pitching where game_id in
         (select game_id from games where away_team in
-         (select away_team from games group by away_team having count(*) < 10))
+         (select away_team from games group by away_team having count(*) < 10)
         )
         """)
     DBSession.query(
