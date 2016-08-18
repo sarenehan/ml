@@ -42,7 +42,7 @@ def save_data(data):
     """
     Pickles the data
     """
-    np.save('mlb/reccomendation_system_data.pkl', data, allow_pickle=False)
+    np.save('mlb/reccomendation_system_data', data, allow_pickle=False)
 
 
 def remove_nan_columns(player_array, axis):
