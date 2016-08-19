@@ -46,8 +46,8 @@ def save_data(data):
 
 
 def remove_nan_columns(player_array, axis):
-    a_axis_length = player_array.shape[axis]
-    b_axis_length = player_array.shape[abs(axis - 1)]
+    a_axis_length = player_array.shape[0]
+    b_axis_length = player_array.shape[1]
     if axis == 0:
         indeces_to_delete = [
             idx for idx in range(a_axis_length)

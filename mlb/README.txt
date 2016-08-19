@@ -47,3 +47,5 @@ then they may be expected to perform better in the next game: ie: 1 - (career_av
 For historical pitcher performance, make sure the pitcher was the starting pitcher
 
 Autoregressive Integrated Moving Average (ARIMA): http://stackoverflow.com/questions/31690134/python-statsmodels-help-using-arima-model-for-time-series
+
+How long the player has been on the road, or how far they traveled recently
