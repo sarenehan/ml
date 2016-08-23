@@ -12,12 +12,12 @@ def load_player_ids(player_id_name):
     """
     Returns a list of distinct player ids
     """
-    return [
+    return np.array([
         point[0] for point in DBSession.query(
             'select distinct({}) from batter_vs_pitcher'.format(
                 player_id_name)
         )
-    ]
+    ])
 
 
 def load_batter_vs_pitcher_averages():
@@ -45,7 +45,15 @@ def save_data(data):
     np.save('mlb/reccomendation_system_data', data, allow_pickle=False)
 
 
-def remove_nan_columns(player_array, axis):
+def remove_nan_players(player_array, player_ids, axis):
+    """
+    Returns player_array and player_ids with players with no non-null
+    stats removed.
+
+    Axis denotes batters or pitchers.
+        axis = 0 denotes batters
+        axis = 1 denotes pitchers
+    """
     a_axis_length = player_array.shape[0]
     b_axis_length = player_array.shape[1]
     if axis == 0:
@@ -62,8 +70,9 @@ def remove_nan_columns(player_array, axis):
     for index in indeces_to_delete:
         eff_index = index - index_offset
         player_array = np.delete(player_array, eff_index, axis)
+        player_ids = np.delete(player_ids, eff_index)
         index_offset += 1
-    return player_array
+    return player_array, player_ids
 
 
 def generate_numpy_array(count_cutoff=10):
@@ -74,6 +83,7 @@ def generate_numpy_array(count_cutoff=10):
     """
     batter_ids = load_player_ids('batter_id')
     pitcher_ids = load_player_ids('pitcher_id')
+
     batter_vs_pitcher_dict = load_batter_vs_pitcher_averages()
     player_array = np.zeros((len(batter_ids), len(pitcher_ids)))
     b_idx = 0
@@ -87,8 +97,10 @@ def generate_numpy_array(count_cutoff=10):
                 player_array[b_idx][p_idx] = b_avg
             else:
                 player_array[b_idx][p_idx] = None
-    player_array = remove_nan_columns(player_array, axis=0)
-    player_array = remove_nan_columns(player_array, axis=1)
+    player_array, batter_ids = remove_nan_players(
+        player_array, batter_ids, axis=0)
+    player_array, batter_ids = remove_nan_players(
+        player_array, pitcher_ids, axis=1)
     shape = np.shape(player_array)
 
     count = sum(
