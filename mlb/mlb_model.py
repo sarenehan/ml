@@ -43,11 +43,12 @@ def remove_columns(data, columns_to_remove):
 
 def load_data():
     columns_to_remove = [
-        'is_starter',
+        # 'is_starter',
         'last_game_was_bad',
-        'last_game_last_month',
+        # 'last_game_last_month',
         'last_week_season',
-        'last_month_season'
+        # 'last_month_season',
+        # 'batter_vs_pitcher'
     ]
     rows = [
         load_batter_obj(row)
@@ -56,9 +57,9 @@ def load_data():
     ]
     return remove_columns([
         row for row in rows
-        if row.average_points > 4
-        and row.is_starter
-        and row.previous_games_count > 20
+        # if row.average_points > 4
+        # if row.is_starter
+        if row.previous_games_count > 20
     ], columns_to_remove)
 
 
@@ -78,7 +79,7 @@ def compute_rmse(predictions, actual):
 
 
 def compute_base_error(x_data, y_data):
-    predictions = [point.average_points for point in x_data]
+    predictions = [point.last_month_average_points for point in x_data]
     return compute_rmse(predictions, y_data)
 
 
@@ -114,10 +115,10 @@ def make_verbose_model(x_data, y_data):
 
 def make_model(x_data, y_data):
     trn_X, val_x, trn_y, val_y = train_test_split(x_data, y_data, test_size=.3)
-    model = GradientBoostingRegressor(n_estimators=300)
+    # model = GradientBoostingRegressor(n_estimators=1200)
     # model = SVR()
     # model = RandomForestRegressor(n_estimators=500)
-    # model = LinearRegression()
+    model = LinearRegression()
     model.fit(trn_X, trn_y)
     print('Model Error: {}'.format(compute_rmse(model.predict(val_x), val_y)))
     # analyzer_error(model, x_data, y_data)
@@ -151,4 +152,4 @@ if __name__ == '__main__':
     x_data, y_data = split_into_output_and_input(all_data)
     print('Base Error: {}'.format(compute_base_error(x_data, y_data)))
     make_model(x_data, y_data)
-    make_verbose_model(x_data, y_data)
+    # make_verbose_model(x_data, y_data)

@@ -11,7 +11,7 @@ import math
 
 
 def load_data():
-    return pd.DataFrame(np.load('mlb/reccomendation_system_data'))
+    return pd.DataFrame(np.load('mlb/reccomendation_system_data.npy'))
 
 
 def changes_nulls_to_zeros(data):
@@ -30,11 +30,7 @@ def factorize_matrix(matrix):
 import numpy
 
 
-def matrix_factorization(R, P, Q, K, steps=5000, alpha=0.0002, beta=0.02):
-    """
-    tutorial: http://www.quuxlabs.com/blog/2010/09/matrix-factorization-a
-    -simple-tutorial-and-implementation-in-python/
-    """
+def matrix_factorization(R, P, Q, K, steps=10, alpha=0.002, beta=0.02):
     Q = Q.T
     for step in range(steps):
         print('Iteration {} of {}'.format(step, steps))
@@ -66,11 +62,18 @@ def matrix_factorization(R, P, Q, K, steps=5000, alpha=0.0002, beta=0.02):
 if __name__ == '__main__':
     data = load_data()
     R = changes_nulls_to_zeros(data)
+    not_null_count = 0
+    not_null_sum = 0
+    for i in range(R.shape[0]):
+        for j in range(R.shape[1]):
+            if R[i][j] != 0:
+                not_null_count += 1
+                not_null_sum += R[i][j]
     # factorize_matrix(data)
     # get_cosine_similarities(data)
     N = len(R)
     M = len(R[0])
-    K = 2
+    K = 16
     P = numpy.random.rand(N, K)
     Q = numpy.random.rand(M, K)
     nP, nQ = matrix_factorization(R, P, Q, K)

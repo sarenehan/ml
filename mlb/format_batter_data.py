@@ -5,6 +5,7 @@ from sklearn.linear_model import LinearRegression
 from statistics import mean, StatisticsError, mode
 from collections import namedtuple
 import csv
+import numpy as np
 
 batter_columns = [
     col[1].replace('.', '') for col in DBSession.get_column('batting')
@@ -27,6 +28,18 @@ MlbGame = namedtuple(
     'Games',
     ' '.join(game_columns)
 )
+batter_ids = np.load('mlb/batter_ids.npy')
+pitcher_ids = np.load('mlb/pitcher_ids.npy')
+# matrix = np.load('mlb/batter_vs_pitcher_cosine_array.npy')
+matrix = np.load('mlb/bvp_data.npy')
+
+batter_v_pitcher_dict = {
+    b_id: {
+        p_id: matrix[i, j]
+        for j, p_id in enumerate(pitcher_ids)
+    }
+    for i, b_id in enumerate(batter_ids)
+}
 
 
 def load_batter_obj(row):
@@ -230,6 +243,12 @@ def format_data(batters, pitchers, games):
             batting_position = mode(
                 bat.batting_position for bat in previous_games
             )
+            try:
+                batter_vs_pitcher = batter_v_pitcher_dict[batter.player_id][
+                    batter.starting_pitcher_id]
+            except KeyError:
+                batter_vs_pitcher = 1.0
+
             batter_rows.append([
                 len(previous_games),
                 batter.points,
@@ -245,9 +264,10 @@ def format_data(batters, pitchers, games):
                 last_game / max(season, 0.01),
                 last_week / max(last_month, 0.01),
                 last_week / max(season, 0.01),
-                last_month / max(season, 0.01)
+                last_month / max(season, 0.01),
+                batter_vs_pitcher,
             ])
-        except (StatisticsError, IndexError):
+        except (StatisticsError, IndexError, ZeroDivisionError):
             continue
     return batter_rows
 
@@ -269,6 +289,7 @@ def write_to_csv_and_create_table(batter_rows):
         'last_game_last_month',
         'last_week_season',
         'last_month_season',
+        'batter_vs_pitcher',
     ]
     csv_filename = 'mlb/batter_formatted_rows.csv'
     with open(csv_filename, 'w') as f:

@@ -97,10 +97,10 @@ def generate_numpy_array(count_cutoff=10):
                 player_array[b_idx][p_idx] = b_avg
             else:
                 player_array[b_idx][p_idx] = None
-    player_array, batter_ids = remove_nan_players(
-        player_array, batter_ids, axis=0)
-    player_array, batter_ids = remove_nan_players(
-        player_array, pitcher_ids, axis=1)
+    # player_array, batter_ids = remove_nan_players(
+    #     player_array, batter_ids, axis=0)
+    # player_array, batter_ids = remove_nan_players(
+    #     player_array, pitcher_ids, axis=1)
     shape = np.shape(player_array)
 
     count = sum(
@@ -110,9 +110,11 @@ def generate_numpy_array(count_cutoff=10):
     print('Count: {}'.format(count))
     print('Shape: {}'.format(shape))
     print('Percentage: {}'.format(100 * (count / total_count)))
-    return player_array
+    return player_array, batter_ids, pitcher_ids
 
 
 if __name__ == '__main__':
-    data = generate_numpy_array()
-    save_data(data)
+    matrix, batter_ids, pitcher_ids = generate_numpy_array()
+    save_data(matrix)
+    np.save('mlb/pitcher_ids', pitcher_ids)
+    np.save('mlb/batter_ids', batter_ids)
